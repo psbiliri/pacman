@@ -231,16 +231,16 @@
             dot.kill();
             
             var audio = new Audio('assets/EatCoin.mp3');
-            audio.play();
+            audio.play()
             
             this.score += 1;
             this.scoreText = 'Score:' + this.score;
-
-        },
         
          if(this.dots.total===0){
             this.dots.callAll('revive');
         }
+		
+	},
 
         update: function () {
           
