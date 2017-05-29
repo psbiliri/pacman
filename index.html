@@ -74,6 +74,7 @@
             this.load.crossOrigin = 'anonymous';
 
             this.load.image('dot', 'assets/coin.png');
+	    this.load.image('mushroom', 'assets/mushroom.png');
 	    this.load.image('hat', 'assets/hat.png');
             this.load.image('tiles', 'assets/pacman-tiles.png');
             this.load.spritesheet('pacman', 'assets/superMario.png', 32, 32);
@@ -93,10 +94,15 @@
             this.dots = this.add.physicsGroup();
 
             this.map.createFromTiles(7, this.safetile, 'dot', this.layer, this.dots);
+	    
+	    this.map.createFromTiles(35, this.safetile, 'mushroom', this.layer, this.mushroom);
 
             //  The dots will need to be offset by 6px to put them back in the middle of the grid
             this.dots.setAll('x', 6, false, false, 1);
             this.dots.setAll('y', 6, false, false, 1);
+		
+	    this.mushroom.setAll('x', 6, false, false, 1);
+            this.mushroom.setAll('y', 6, false, false, 1);
 
             //  Pacman should collide with everything except the safe tile
             this.map.setCollisionByExclusion([this.safetile], true, this.layer);
@@ -115,7 +121,8 @@
             this.move(Phaser.LEFT);
             
             this.scoreText = game.add.text(0, 500, 'Score: 0', { fontSize: '20px Arial', fill: 'white' });
-            //this.bonusText = game.add.text(350, 500, 'Bonus: 0', { fontSize: '20px Arial', fill: 'white' });
+		
+            this.bonusText = game.add.text(350, 500, 'Bonus: 0', { fontSize: '20px Arial', fill: 'white' });
       
         },
 
@@ -241,10 +248,26 @@
             audio.play()
             
             this.score += 1;
-            this.scoreText = 'Score:' + this.score;
+            this.scoreText.text = 'Score:' + this.score;
         
             if(this.dots.total===0){
            	 this.dots.callAll('revive');
+	    }
+		
+	},
+	    
+	eatBonus: function (pacman, mushroom) {
+
+            mushroom.kill();
+            
+            var audio = new Audio('assets/EatCoin.mp3');
+            audio.play()
+            
+            this.bonus += 5;
+            this.bonusText.text = 'Bonus:' + this.bonus;
+        
+            if(this.mushroom.total===0){
+           	 this.mushroom.callAll('revive');
             }
 		
 	},
@@ -253,6 +276,7 @@
           
             this.physics.arcade.collide(this.pacman, this.layer);
             this.physics.arcade.overlap(this.pacman, this.dots, this.eatDot, null, this);
+            this.physics.arcade.overlap(this.pacman, this.mushroom, this.eatBonus, null, this);
 
             this.marker.x = this.math.snapToFloor(Math.floor(this.pacman.x), this.gridsize) / this.gridsize;
             this.marker.y = this.math.snapToFloor(Math.floor(this.pacman.y), this.gridsize) / this.gridsize;
